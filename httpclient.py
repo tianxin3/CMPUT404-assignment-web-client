@@ -22,7 +22,7 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-import urllib.parse
+import urllib.parse, urlencode
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -81,13 +81,50 @@ class HTTPClient(object):
         return buffer.decode('utf-8')
 
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        # code = 500
+        # body = ""
+
+        # Get host&port and connect to it
+        host, port = self.get_host_port(url)
+        self.connect(host, port)
+
+        # Send GET request
+        request_content = "GET {0} HTTP/1.1\r\nHost: {1}\r\nConnection: close\r\n\r\n".format(url, host)
+        self.sendall(request_content)
+
+        # Get response
+        response_content = self.recvall(self.socket)
+        code = self.get_code(response_content)
+        body = self.get_body(response_content)
+        self.close()
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
-        code = 500
-        body = ""
+        # code = 500
+        # body = ""
+
+        # Get host&port and connect to it
+        host, port = self.get_host_port(url)
+        self.connect(host, port)
+
+        # Encode body
+        if args != None:
+            encode_args = urlencode(args)
+        else:
+            encode_args = ""
+        args_length = len(encode_args)
+
+        # Send POST request
+        request_content = "POST {0} HTTP/1.1\r\nHost: {1}\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length:{2}\r\nConnection: close\r\n\r\n{3}".format(url, host, args_length, encode_args)
+        self.sendall(request_content)
+
+        # Get response
+        response_content = self.recvall(self.socket)
+        code = self.get_code(response_content)
+        body = self.get_body(response_content)
+        self.close()
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
