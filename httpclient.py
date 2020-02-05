@@ -22,7 +22,8 @@ import sys
 import socket
 import re
 # you may use urllib to encode data appropriately
-import urllib.parse, urlencode
+import urllib.parse
+from urllib.parse import urlencode
 
 def help():
     print("httpclient.py [GET/POST] [URL]\n")
@@ -54,7 +55,7 @@ class HTTPClient(object):
     def get_code(self, data):
         statusLine = data.split("\r\n")[0]
         statusCode = statusLine.split(" ")[1]
-        return statusCode
+        return int(statusCode)
 
     def get_headers(self,data):
         return data.split("\r\n\r\n")[0]
