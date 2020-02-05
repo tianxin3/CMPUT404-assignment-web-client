@@ -33,7 +33,18 @@ class HTTPResponse(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
+
+
+    def get_host_port(self,url):
+
+        urlContent = urllib.parse.urlparse(url)
+        host = urlContent.hostname
+        port = urlContent.port
+
+        if port == None:
+            port = 80
+
+        return host, port
 
     def connect(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,13 +52,15 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        return None
+        statusLine = data.split("\r\n")[0]
+        statusCode = statusLine.split(" ")[1]
+        return statusCode
 
     def get_headers(self,data):
-        return None
+        return data.split("\r\n\r\n")[0]
 
     def get_body(self, data):
-        return None
+        return data.split("\r\n\r\n")[1]
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
