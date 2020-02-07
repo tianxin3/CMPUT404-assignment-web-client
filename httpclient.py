@@ -123,6 +123,7 @@ class HTTPClient(object):
 
         # Get response
         response_content = self.recvall(self.socket)
+        print(response_content)
         code = self.get_code(response_content)
         body = self.get_body(response_content)
         self.close()
